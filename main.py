@@ -5,8 +5,14 @@
 ## main
 ##
 
+from os import kill
 from pprint import pp, pprint
+from re import L
 import sys
+from tkinter.messagebox import NO
+from unicodedata import name
+
+from sklearn import pipeline
 contributors  = []
 projects = []
 
@@ -30,6 +36,8 @@ if len(sys.argv) != 2:
     print("need 1 file")
     sys.exit(-1)
 
+skills = {}
+
 with open(sys.argv[1]) as f:
     for line in f:
         cmds.append(line[0:-1])
@@ -40,10 +48,39 @@ with open(sys.argv[1]) as f:
     for i in range(nb_contributors):
         contributor = parceContributor(cmds.pop(0))
         for i in range(contributor["nb_skills"]):
-            contributor["skills"].append(parceSkill(cmds.pop(0)))
-        contributors.append(contributor)
+            tskill = parceSkill(cmds.pop(0))
+            t = tskill["name"]
+            if skills.get(t) == None:
+                skills[t] = []
+            tskill["name"] = contributor["name"]
+            skills[t].append(tskill)
     for i in range(nb_project):
         project = parceProject(cmds.pop(0))
         for i in range(project["nb_skills"]):
             project["skills"].append(parceSkill(cmds.pop(0)))
         projects.append(project)
+
+i = 0
+imp_project = []
+for project in projects:
+    for skill in project["skills"]:
+        name = skill["name"]
+        lvl = skill["lvl"]
+        skill = skills.get(name)
+        if skill == None:
+            imp_project.append(projects.pop(i))
+            i -= 1
+            break
+        b = 0
+        for t in skill:
+            if t["lvl"] >= lvl:
+                b = 1
+                break
+        if b == 0:
+            imp_project.append(projects.pop(i))
+            i -= 1
+            break
+    i += 1
+
+print(i)
+# pprint(projects)
