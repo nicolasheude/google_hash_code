@@ -43,6 +43,20 @@ def calcScore(time, score, bb, day):
         return (score + t)
     return score
 
+def getBestProject(projects):
+    bestScore = 0
+    bestTime = 999999
+    idxToSave = 0
+    day = 0
+    for val, project in enumerate(projects):
+        tmp = calcScore(project['time'], project['score'], project['best_before'], day)
+        print(tmp)
+        if bestScore < tmp and bestTime < project['time']:
+            bestScore = tmp
+            bestTime = project['time']
+            idxToSave = val
+    return projects[idxToSave]
+
 
 if len(sys.argv) != 2:
     print("need 1 file")
@@ -94,20 +108,10 @@ for project in projects:
             break
     i += 1
 
-bestScore = 0
-bestTime = 999999
-idxToSave = 0
-day = 0
-for val, project in enumerate(projects):
-    tmp = calcScore(project['time'], project['score'], project['best_before'], day)
-    print(tmp)
-    if bestScore < tmp and bestTime < project['time']:
-        bestScore = tmp
-        bestTime = project['time']
-        idxToSave = val
+bestPrj = getBestProject(projects)
 
 print(i)
 
-print(projects[idxToSave])
+print(bestPrj)
 
 # pprint(projects)
